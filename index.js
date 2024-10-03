@@ -7,7 +7,7 @@ const dotenv = require("dotenv")
 const app = express()
 const Routes = require("./routes/route.js")
 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || https://attend-api.vercel.app/
 
 dotenv.config();
 
