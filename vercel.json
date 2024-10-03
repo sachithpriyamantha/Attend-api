@@ -7,7 +7,7 @@
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },   // For API routing
-    { "src": "/(.*)", "dest": "/" }              // Catch-all route
+    { "src": "/api/(.*)", "dest": "/api/$1" },   
+    { "src": "/(.*)", "dest": "/" }              
   ]
 }
