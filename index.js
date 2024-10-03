@@ -13,7 +13,11 @@ dotenv.config();
 
 
 app.use(express.json({ limit: '10mb' }))
-app.use(cors())
+app.use(cors({
+    origin: ["https://attend-tuition.vercel.app"],
+    methods: ["GET", "POST","PUT","DELETE"],
+    credentials:true
+}))
 
 mongoose
     .connect(process.env.MONGO_URL, {
