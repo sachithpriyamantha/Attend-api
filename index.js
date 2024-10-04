@@ -15,7 +15,7 @@ app.use(express.json());
 
 // CORS Configuration (allowing frontend URL)
 app.use(cors({
-    origin: "https://attend-tuition.vercel.app", // Allow this origin
+    origin: "https://attend-tuition-pkdcs9af6-sachiths-projects-5885b2f4.vercel.app/Adminlogin", // Allow this origin
     methods: ["GET", "POST", "PUT", "DELETE"],    // Allowed methods
     credentials: true                             // Allow credentials (cookies)
 }));
