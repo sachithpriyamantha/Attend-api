@@ -13,7 +13,14 @@ dotenv.config();
 // Enable JSON parsing
 app.use(express.json());
 
-// CORS Configuration (allowing frontend URL)
+const cors = require('cors');
+app.use(cors({
+  origin: 'https://attend-tuition.vercel.app', // your frontend origin
+  methods: ['GET', 'POST', 'OPTIONS'], // allowed methods
+  credentials: true, // if you're sending cookies or auth tokens
+  allowedHeaders: ['Content-Type', 'Authorization'] // allow specific headers
+}));
+
 
 // Handle preflight requests (OPTIONS)
 app.options('*', cors());
