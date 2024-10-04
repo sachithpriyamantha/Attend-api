@@ -14,11 +14,6 @@ dotenv.config();
 app.use(express.json());
 
 // CORS Configuration (allowing frontend URL)
-app.use(cors({
-    origin: "https://attend-api.vercel.app//AdminLogin", // Allow this origin
-    methods: ["GET", "POST", "PUT", "DELETE"],    // Allowed methods
-    credentials: true                             // Allow credentials (cookies)
-}));
 
 // Handle preflight requests (OPTIONS)
 app.options('*', cors());
