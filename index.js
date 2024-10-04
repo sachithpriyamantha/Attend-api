@@ -18,7 +18,7 @@ app.use(cors({
   origin: 'https://attend-tuition.vercel.app', // your frontend origin
   methods: ['GET', 'POST', 'OPTIONS'], // allowed methods
   credentials: true, // if you're sending cookies or auth tokens
-  allowedHeaders: ['Content-Type', 'Authorization'] // allow specific headers
+  
 }));
 
 
