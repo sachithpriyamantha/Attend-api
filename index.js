@@ -15,7 +15,7 @@ app.use(express.json());
 
 // CORS Configuration (allowing frontend URL)
 app.use(cors({
-    origin: "https://attend-api.vercel.app/AdminLogin", // Allow this origin
+    origin: "https://attend-api.vercel.app", // Allow this origin
     methods: ["GET", "POST", "PUT", "DELETE"],    // Allowed methods
     credentials: true                             // Allow credentials (cookies)
 }));
