@@ -2,7 +2,12 @@ const router = require('express').Router();
 
 // const { adminRegister, adminLogIn, deleteAdmin, getAdminDetail, updateAdmin } = require('../controllers/admin-controller.js');
 
-const { adminRegister, adminLogIn, getAdminDetail} = require('../controllers/admin-controller.js');
+// const { adminRegister, adminLogIn, getAdminDetail} = require('../controllers/admin-controller.js');.
+
+const url = role === 'Admin'
+    ? 'https://attend-api.vercel.app/AdminLogin'  // Correct URL
+    : 'https://attend-api.vercel.app/StudentLogin';  // Correct URL for StudentLogin
+
 
 const { sclassCreate, sclassList, deleteSclass, deleteSclasses, getSclassDetail, getSclassStudents } = require('../controllers/class-controller.js');
 const { complainCreate, complainList } = require('../controllers/complain-controller.js');
