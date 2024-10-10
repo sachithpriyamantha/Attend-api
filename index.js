@@ -14,7 +14,8 @@ dotenv.config();
 
 app.use(express.json({ limit: '10mb' }))
 app.use(cors({
-    origin: ["https://attend-tuition.vercel.app"],
+    // origin: ["https://attend-tuition.vercel.app"],
+    origin: ["http://tuitionatttrack.dtselife.com"],
     methods: ["GET", "POST","PUT","DELETE"],
     credentials: true
 }))
