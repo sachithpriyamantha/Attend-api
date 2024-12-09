@@ -84,7 +84,8 @@ const adminLogIn = async (req, res) => {
     if (req.body.email && req.body.password) {
         let admin = await Admin.findOne({ email: req.body.email });
         if (admin) {
-            if (req.body.password === admin.password) {
+            const isValidPassword = await bcrypt.compare(req.body.password, admin.password);
+if (isValidPassword) {
                 admin.password = undefined;
                 res.send(admin);
             } else {
@@ -130,23 +131,57 @@ const deleteAdmin = async (req, res) => {
     }
 }
 
+// const updateAdmin = async (req, res) => {
+//     try {
+//         if (req.body.password) {
+//             const salt = await bcrypt.genSalt(10)
+//             res.body.password = await bcrypt.hash(res.body.password, salt)
+//         }
+//         let result = await Admin.findByIdAndUpdate(req.params.id,
+//             { $set: req.body },
+//             { new: true })
+
+//         result.password = undefined;
+//         res.send(result)
+//     } catch (error) {
+//         res.status(500).json(err);
+//     }
+// }
+
+
+
 const updateAdmin = async (req, res) => {
     try {
-        if (req.body.password) {
-            const salt = await bcrypt.genSalt(10)
-            res.body.password = await bcrypt.hash(res.body.password, salt)
+        const { id } = req.params;
+        const updateData = { ...req.body };
+
+        if (updateData.password) {
+            const salt = await bcrypt.genSalt(10);
+            updateData.password = await bcrypt.hash(updateData.password, salt);
         }
-        let result = await Admin.findByIdAndUpdate(req.params.id,
-            { $set: req.body },
-            { new: true })
 
-        result.password = undefined;
-        res.send(result)
+        const updatedAdmin = await Admin.findByIdAndUpdate(id, updateData, { new: true });
+
+        if (!updatedAdmin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        updatedAdmin.password = undefined; // Remove password from the response
+        res.status(200).json(updatedAdmin);
     } catch (error) {
-        res.status(500).json(err);
+        console.error("Error in updateAdmin:", error.message);
+        res.status(500).json({ message: 'Server error' });
     }
-}
+};
 
-module.exports = { adminRegister, adminLogIn, getAdminDetail, deleteAdmin, updateAdmin };
 
-module.exports = { adminRegister, adminLogIn, getAdminDetail };
+
+module.exports = { adminRegister, adminLogIn, getAdminDetail,deleteAdmin, updateAdmin };
+
+
+
+
+//module.exports = { adminRegister, adminLogIn, getAdminDetail, deleteAdmin, updateAdmin };
+
+
+//module.exports = { adminRegister, adminLogIn, getAdminDetail };
