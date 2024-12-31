@@ -55,49 +55,105 @@ const Complain = require('../models/complainSchema.js');
 //     }
 // };
 
+// const adminRegister = async (req, res) => {
+//     try {
+//         const admin = new Admin({
+//             ...req.body
+//         });
+
+//         const existingAdminByEmail = await Admin.findOne({ email: req.body.email });
+//         const existingSchool = await Admin.findOne({ schoolName: req.body.schoolName });
+
+//         if (existingAdminByEmail) {
+//             res.send({ message: 'Email already exists' });
+//         }
+//         else if (existingSchool) {
+//             res.send({ message: 'School name already exists' });
+//         }
+//         else {
+//             let result = await admin.save();
+//             result.password = undefined;
+//             res.send(result);
+//         }
+//     } catch (err) {
+//         res.status(500).json(err);
+//     }
+// };
 const adminRegister = async (req, res) => {
     try {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPass = await bcrypt.hash(req.body.password, salt);
+
         const admin = new Admin({
-            ...req.body
+            ...req.body,
+            password: hashedPass
         });
 
         const existingAdminByEmail = await Admin.findOne({ email: req.body.email });
         const existingSchool = await Admin.findOne({ schoolName: req.body.schoolName });
 
         if (existingAdminByEmail) {
-            res.send({ message: 'Email already exists' });
+            return res.status(400).json({ message: 'Email already exists' });
         }
-        else if (existingSchool) {
-            res.send({ message: 'School name already exists' });
+        if (existingSchool) {
+            return res.status(400).json({ message: 'School name already exists' });
         }
-        else {
-            let result = await admin.save();
-            result.password = undefined;
-            res.send(result);
-        }
+
+        let result = await admin.save();
+        result.password = undefined; // Hide password from response
+        res.status(201).json(result);
     } catch (err) {
-        res.status(500).json(err);
+        console.error('Error in adminRegister:', err.message);
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
+// const adminLogIn = async (req, res) => {
+//     if (req.body.email && req.body.password) {
+//         let admin = await Admin.findOne({ email: req.body.email });
+//         if (admin) {
+//             const isValidPassword = await bcrypt.compare(req.body.password, admin.password);
+// if (isValidPassword) {
+//                 admin.password = undefined;
+//                 res.send(admin);
+//             } else {
+//                 res.send({ message: "Invalid password" });
+//             }
+//         } else {
+//             res.send({ message: "User not found" });
+//         }
+//     } else {
+//         res.send({ message: "Email and password are required" });
+//     }
+// };
+
+
 const adminLogIn = async (req, res) => {
-    if (req.body.email && req.body.password) {
-        let admin = await Admin.findOne({ email: req.body.email });
-        if (admin) {
-            const isValidPassword = await bcrypt.compare(req.body.password, admin.password);
-if (isValidPassword) {
-                admin.password = undefined;
-                res.send(admin);
-            } else {
-                res.send({ message: "Invalid password" });
-            }
-        } else {
-            res.send({ message: "User not found" });
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email and password are required" });
         }
-    } else {
-        res.send({ message: "Email and password are required" });
+
+        const admin = await Admin.findOne({ email });
+        if (!admin) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const isValidPassword = await bcrypt.compare(password, admin.password);
+        if (!isValidPassword) {
+            return res.status(401).json({ message: "Invalid password" });
+        }
+
+        admin.password = undefined; // Hide password from response
+        res.status(200).json(admin);
+    } catch (err) {
+        console.error('Error in adminLogIn:', err.message);
+        res.status(500).json({ message: 'Server error' });
     }
 };
+
+
 
 const getAdminDetail = async (req, res) => {
     try {
