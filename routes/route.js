@@ -7,7 +7,7 @@ const { adminRegister, adminLogIn, getAdminDetail, updateAdmin } = require('../c
 
 const { sclassCreate, sclassList, deleteSclass, deleteSclasses, getSclassDetail, getSclassStudents } = require('../controllers/class-controller.js');
 const { complainCreate, complainList } = require('../controllers/complain-controller.js');
-const { noticeCreate, noticeList, deleteNotices, deleteNotice, updateNotice } = require('../controllers/notice-controller.js');
+const { noticeCreate, noticeList, deleteNotices, deleteNotice, updateNotice, getNoticeFile} = require('../controllers/notice-controller.js');
 const {
     studentRegister,
     studentLogIn,
@@ -84,9 +84,10 @@ router.post('/NoticeCreate', noticeCreate);
 
 router.get('/NoticeList/:id', noticeList);
 
+
 router.delete("/Notices/:id", deleteNotices)
 router.delete("/Notice/:id", deleteNotice)
-
+router.get('/noticeFile/:filename', getNoticeFile);
 router.put("/Notice/:id", updateNotice)
 
 // Complain
