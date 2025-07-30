@@ -2,27 +2,111 @@ const bcrypt = require('bcrypt');
 const Teacher = require('../models/teacherSchema.js');
 const Subject = require('../models/subjectSchema.js');
 
+// const teacherRegister = async (req, res) => {
+//     const {teacherId, name, email, password, role, school, teachSubject, teachSclass } = req.body;
+//     try {
+//         // Check if teacherId already exists
+//         const existingTeacherById = await Teacher.findOne({ teacherId });
+//         if (existingTeacherById) {
+//             return res.send({ message: 'Teacher ID already exists' });
+//         }
+
+//         const existingTeacherByEmail = await Teacher.findOne({ email });
+//         if (existingTeacherByEmail) {
+//             return res.send({ message: 'Email already exists' });
+//         }
+
+//         const salt = await bcrypt.genSalt(10);
+//         const hashedPass = await bcrypt.hash(password, salt);
+
+//         const teacher = new Teacher({ 
+//             teacherId, 
+//             name, 
+//             email, 
+//             password: hashedPass, 
+//             role, 
+//             school, 
+//             teachSubject, 
+//             teachSclass 
+//         });
+
+//         let result = await teacher.save();
+//         await Subject.findByIdAndUpdate(teachSubject, { teacher: teacher._id });
+//         result.password = undefined;
+//         res.send(result);
+//     } catch (err) {
+//         res.status(500).json(err);
+//     }
+// };
+const generateTeacherId = async () => {
+    const currentYear = new Date().getFullYear();
+    const prefix = `TCH-${currentYear}-`;
+    
+    const lastTeacher = await Teacher.findOne({ teacherId: new RegExp(`^${prefix}`) })
+        .sort({ teacherId: -1 })
+        .limit(1);
+    
+    let sequence = 1;
+    if (lastTeacher) {
+        const lastSequence = parseInt(lastTeacher.teacherId.split('-')[2]);
+        sequence = lastSequence + 1;
+    }
+    
+    return `${prefix}${sequence.toString().padStart(3, '0')}`;
+};
+
+
 const teacherRegister = async (req, res) => {
-    const { name, email, password, role, school, teachSubject, teachSclass } = req.body;
+    const { teacherId, name, email, password, role, school, teachSubject, teachSclass } = req.body;
+    
     try {
+        // Check for existing teacherId and email in parallel
+        const [existingTeacherById, existingTeacherByEmail] = await Promise.all([
+            Teacher.findOne({ teacherId }),
+            Teacher.findOne({ email })
+        ]);
+
+        const errors = {};
+        if (existingTeacherById) errors.teacherId = "Teacher ID already exists";
+        if (existingTeacherByEmail) errors.email = "Email already exists";
+
+        if (Object.keys(errors).length > 0) {
+            return res.status(400).json({ 
+                success: false,
+                errors 
+            });
+        }
+
         const salt = await bcrypt.genSalt(10);
         const hashedPass = await bcrypt.hash(password, salt);
 
-        const teacher = new Teacher({ name, email, password: hashedPass, role, school, teachSubject, teachSclass });
+        const teacher = new Teacher({ 
+            teacherId, 
+            name, 
+            email, 
+            password: hashedPass, 
+            role, 
+            school, 
+            teachSubject, 
+            teachSclass 
+        });
 
-        const existingTeacherByEmail = await Teacher.findOne({ email });
-
-        if (existingTeacherByEmail) {
-            res.send({ message: 'Email already exists' });
-        }
-        else {
-            let result = await teacher.save();
-            await Subject.findByIdAndUpdate(teachSubject, { teacher: teacher._id });
-            result.password = undefined;
-            res.send(result);
-        }
+        const result = await teacher.save();
+        await Subject.findByIdAndUpdate(teachSubject, { teacher: teacher._id });
+        
+        res.status(201).json({
+            success: true,
+            teacher: {
+                ...result._doc,
+                password: undefined
+            }
+        });
     } catch (err) {
-        res.status(500).json(err);
+        res.status(500).json({ 
+            success: false,
+            message: "Server error occurred",
+            error: err.message 
+        });
     }
 };
 
