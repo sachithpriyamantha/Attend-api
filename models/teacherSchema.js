@@ -10,11 +10,7 @@ const teacherSchema = new mongoose.Schema({
         unique: true,
         required: true,
     },
-    teacherId: {
-        type: String,
-        unique: true,
-        required: true,
-    },
+
     
     password: {
         type: String,
